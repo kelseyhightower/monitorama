@@ -1,0 +1,45 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: app
+    track: stable
+  name: app
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: app
+        track: stable
+      name: app
+    spec:
+      containers:
+        - name: app
+          image: kelseyhightower/app-healthz:1.0.0
+          imagePullPolicy: Always
+          env:
+            - name: HTTP_ADDR
+              value: "0.0.0.0:80"
+            - name: DATABASE_USERNAME
+              value: app
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app
+                  key: database-password
+            - name: DATABASE_HOST
+              value: "mysql:3306"
+            - name: DATABASE_NAME
+              value: "app"
+          ports:
+            - name: http
+              containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 80
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 5

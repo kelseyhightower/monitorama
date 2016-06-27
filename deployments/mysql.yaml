@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: mysql
+  name: mysql
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+      name: mysql
+    spec:
+      containers:
+        - name: mysql-healthz
+          image: kelseyhightower/mysql-healthz:1.0.0
+          env:
+            - name: HTTP_ADDR
+              value: "0.0.0.0:80"
+            - name: DATABASE_USERNAME
+              value: root
+            - name: DATABASE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql
+                  key: root-password
+            - name: DATABASE_HOST
+              value: "127.0.0.1:3306"
+          ports:
+            - name: healthz
+              containerPort: 80
+        - name: mysql
+          image: mysql/mysql-server:5.6
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql
+                  key: root-password
+          ports:
+            - name: mysql
+              containerPort: 3306
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-data
+      volumes:
+      - name: "mysql-data"
+        gcePersistentDisk:
+          pdName: mysql-data
+          fsType: ext4

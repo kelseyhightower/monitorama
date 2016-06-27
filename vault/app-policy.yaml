@@ -1,0 +1,11 @@
+path "secret/app" {
+  capabilities = ["read", "list"]
+}
+
+path "mysql/creds/app" {
+  capabilities = ["read", "list"]
+}
+
+path "sys/renew/*" {
+  capabilities = ["update"]
+}
