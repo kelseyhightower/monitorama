@@ -28,8 +28,8 @@ spec:
             - name: VAULT_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: app
-                  key: vault-token 
+                  name: app-vault-token
+                  key: vault-token
           ports:
             - name: http
               containerPort: 80

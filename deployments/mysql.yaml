@@ -45,7 +45,7 @@ spec:
             - mountPath: /var/lib/mysql
               name: mysql-data
       volumes:
-      - name: "mysql-data"
-        gcePersistentDisk:
-          pdName: mysql-data
-          fsType: ext4
+        - name: "mysql-data"
+          gcePersistentDisk:
+            pdName: mysql-data
+            fsType: ext4

@@ -29,11 +29,23 @@ CREATE USER 'app'@'%' IDENTIFIED BY 'm0n1t0rAmA';GRANT ALL PRIVILEGES ON app.* T
 ### Vault
 
 ```
+gcloud compute disks create vault-data
+```
+
+```
+kubectl create configmap vault-conf --from-file=configs/vault.hcl
+```
+
+```
 kubectl create -f deployments/vault.yaml
 ```
 
 ```
-kubectl port-forward <vault-pod> 8200:8200
+kubectl get pods
+```
+
+```
+kubectl exec --tty -i <vault-pod> /bin/bash
 ```
 
 ```
@@ -41,17 +53,34 @@ export VAULT_ADDR="http://127.0.0.1:8200"
 ```
 
 ```
+vault init
+```
+
+```
+vault unseal
+```
+
+```
+vault status
+```
+
+```
 vault auth <root-token>
 ```
 
 ```
-vault policy-write app vault/app-policy.hcl
+vault policy-write app app-policy.hcl
 ```
 
 ```
 vault token-create \
   -policy="app" \
   -display-name="app"
+```
+
+```
+kubectl create secret generic app-vault-token \
+  --from-literal='vault-token=<app-token>'
 ```
 
 ```
@@ -77,6 +106,5 @@ kubectl create secret generic mysql \
 
 ```
 kubectl create secret generic app \
-  --from-literal='database-password=m0n1t0rAmA' \
-  --from-literal='vault-token=3c1776dd-9673-4347-b7d1-dda8d84232cd'
+  --from-literal='database-password=m0n1t0rAmA'
 ```

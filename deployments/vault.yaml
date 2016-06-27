@@ -17,8 +17,7 @@ spec:
           image: kelseyhightower/vault:0.6.0
           args:
             - "server"
-            - "-dev"
-            - "-dev-listen-address=0.0.0.0:8200"
+            - "-config=/etc/vault/vault.hcl"
           ports:
             - name: http
               containerPort: 8200
@@ -30,3 +29,19 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 15
             timeoutSeconds: 5
+          volumeMounts:
+            - name: "vault-conf"
+              mountPath: "/etc/vault"
+            - name: "vault-data"
+              mountPath: "/var/lib/vault"
+      volumes:
+        - name: "vault-data"
+          gcePersistentDisk:
+            pdName: vault-data
+            fsType: ext4
+        - name: "vault-conf"
+          configMap:
+            name: "vault-conf"
+            items:
+              - key: "vault.hcl"
+                path: "vault.hcl"
